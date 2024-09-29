@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<Resource driverClassName="org.mariadb.jdbc.Driver"
+		auth="Container"
+		initialSize="1"
+		maxIdle="1"
+		maxWaitMillis="-1"
+		name="jdbc/localDB"
+		type="javax.sql.DataSource"
+		url="jdbc:mysql://127.0.0.1:3306/test2"
+		username="root"
+		password="password"
+		defaultAutoCommit="false" />
+	<ResourceLink name="jdbc/authDB"
+            global="jdbc/authDB"
+            type="javax.sql.DataSource" />
+
+</Context>
