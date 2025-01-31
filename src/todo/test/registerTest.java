@@ -1,4 +1,4 @@
-package test;
+package todo.test;
 
 import java.io.IOException;
 
@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 
 import todo.dao.MemberDAO;
-import todo.entity.Member;
+import todo.dto.Member;
 import todo.web.M_registerServlet;
 
 class registerTest extends M_registerServlet{

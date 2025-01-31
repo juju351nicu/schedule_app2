@@ -14,8 +14,10 @@
 <jsp:include page="header.jsp"/>
 <jsp:include page="nav.jsp" />
 </head>
-<h4><font color="red" >${message} </font></h4>
+
 <body>
+<h4><font color="red" >${message} </font></h4>
+<h1>以下の内容で更新します。よろしいでしょうか？</h1>
 苗字:
 ${dto.name_sei }
 名前
@@ -24,13 +26,26 @@ ${dto.name_mei }
 ${dto.login_id}
 パスワード:
 ${dto.password }
-登録日:
-${dto.registered_date}
-更新日:
-${dto.updated_date}
-最終ログイン日時:
-${dto.last_login}
+
 削除フラッグ:
 ${dto.delete_flag }
+<form action="" method="Post">
+		<%-- <input type="hidden" name="id" value="${dto.id}"> --%>
+		<input type="hidden" name="name_sei" value="${dto.name_sei}">
+		<input type="hidden" name="name_mei" value="${dto.name_mei}">
+		<input type="hidden" name="login_id" value="${dto.login_id}">
+		<input type="hidden" name="password" value="${dto.password}">
+		<input type="hidden" name="delete_flag" value="${dto.delete_flag}">
+		<input class="btn-success" type="submit" name="button" value="登録">
+		<input class="btn-success" type="submit" name="button" value="修正">
+	</form>
+<br>
+<form id="main" method="post" name="main" action="" onsubmit="redirect(this);">
+    <input type="hidden" name="submit"/>
+</form>
+<input class="btn btn-warning" type="submit" onclick="location.href='/Member/todo/Top'" value="トップページへ">
+<div>
+	<a class="btn btn-info" href="javascript:history.back()">戻る</a>
+</div>
 </body>
 </html>

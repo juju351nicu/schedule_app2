@@ -3,6 +3,11 @@ package todo.entity;
 import java.sql.Date;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * TODO tableópÇÃEntityÅB
+ * @author d5riv
+ * @since 2020/11/21
+ */
 public class Todo
 {
      private int id;
@@ -83,5 +88,7 @@ public class Todo
             localdate = String.valueOf(day);
             return localdate;
         }
+
+
 }
 

@@ -15,20 +15,24 @@ public final class DateUtils
         return LocalDate.parse(dateStr);
     }
 
-    public static Date LocalDateToSQlDate(LocalDate date)
+    public static LocalDate SQLDateToLocalDate(java.sql.Date date)
+    {
+        return date.toLocalDate();
+    }
+    public static Date LocalDateToSQLDate(LocalDate date)
     {
         return java.sql.Date.valueOf(date);
     }
 
     public static Date StrToSqlDate(String dateStr)
     {
-        return LocalDateToSQlDate(StrToLocalDate(dateStr));
+        return LocalDateToSQLDate(StrToLocalDate(dateStr));
     }
     /**
-     * Date_fromã‹Date_toã‚’ãƒ•ãƒ­ãƒ³ãƒˆç”»é¢ã§å…¥åŠ›ã™ã‚‹ã¨Stringå‹ã«å¤‰æ›ã•ã‚Œã‚‹ãŸã‚ã€
-     * Stringå‹ã®ã‚‚ã®ã‚’sqlã®Dateå‹ã«å¤‰æ›ã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ç”¨æ„ã—ãŸã€‚
+     * Date_from‚©Date_to‚ğƒtƒƒ“ƒg‰æ–Ê‚Å“ü—Í‚·‚é‚ÆStringŒ^‚É•ÏŠ·‚³‚ê‚é‚½‚ßA
+     * StringŒ^‚Ì‚à‚Ì‚ğsql‚ÌDateŒ^‚É•ÏŠ·‚·‚éƒƒ\ƒbƒh‚ğ—pˆÓ‚µ‚½B
      * @param strdate
-     * @return Dateå‹ã§è¿”ã•ã‚Œã‚‹ã€‚
+     * @return DateŒ^‚Å•Ô‚³‚ê‚éB
      */
     public static Date datesql(String strdate) {
         /*
@@ -41,30 +45,30 @@ public final class DateUtils
         return sqlDate;
 
         }catch(DateTimeParseException e) {
-            LocalDate nowdate = LocalDate.parse("2019-09-11");
+            LocalDate nowdate = LocalDate.now();
             java.sql.Date sqlnow = java.sql.Date.valueOf(nowdate);
-            System.out.println("ä»Šæ—¥ã®æ—¥ä»˜ã¯" + strdate);
+            System.out.println("¡“ú‚Ì“ú•t‚Í" + strdate);
             return sqlnow;
 
         }
     }
     /**
-     * register_deteã‹update_date,last_loginã‚’ãƒ•ãƒ­ãƒ³ãƒˆç”»é¢ã§å…¥åŠ›ã™ã‚‹ã¨Stringå‹ã«å¤‰æ›ã•ã‚Œã‚‹ãŸã‚ã€
-     * Stringå‹ã®ã‚‚ã®ã‚’sqlã®Timestampå‹ã«å¤‰æ›ã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰ã‚’ç”¨æ„ã—ãŸã€‚
+     * register_dete‚©update_date,last_login‚ğƒtƒƒ“ƒg‰æ–Ê‚Å“ü—Í‚·‚é‚ÆStringŒ^‚É•ÏŠ·‚³‚ê‚é‚½‚ßA
+     * StringŒ^‚Ì‚à‚Ì‚ğsql‚ÌTimestampŒ^‚É•ÏŠ·‚·‚éƒƒ\ƒbƒh‚ğ—pˆÓ‚µ‚½B
      * @param strTimestamp
      * @return
      */
     public static Timestamp sqlTimestamp(String strTimestamp) {
     	try
     	{
-    	//Stringå‹ã‹ã‚‰Timestampå‹ã¸å¤‰æ›ã‚’ã™ã‚‹
+    	//StringŒ^‚©‚çTimestampŒ^‚Ö•ÏŠ·‚ğ‚·‚é
 		LocalDateTime dateTime = LocalDateTime.parse(strTimestamp);
 	    //LocalDateTime dateTime = date.atStartOfDay();
         Timestamp timestamp = Timestamp.valueOf(dateTime);
         	return timestamp;
 
 	    }catch(DateTimeParseException e) {
-	    	//ä½•ã‚‚å…¥åŠ›ã—ãªã‹ã£ãŸå ´åˆã¯DateTimeParseExceptionãŒç™ºç”Ÿã™ã‚‹ã®ã§ç¾åœ¨æ™‚åˆ»ã§æ›´æ–°ã™ã‚‹
+	    	//‰½‚à“ü—Í‚µ‚È‚©‚Á‚½ê‡‚ÍDateTimeParseException‚ª”­¶‚·‚é‚Ì‚ÅŒ»İ‚ÅXV‚·‚é
 	    	LocalDateTime now = LocalDateTime.now();
 	    	Timestamp sqlnow = Timestamp.valueOf(now);
 	    	return sqlnow;

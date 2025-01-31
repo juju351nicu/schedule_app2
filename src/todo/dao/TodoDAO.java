@@ -5,146 +5,323 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+import todo.criteria.TodoCriteria;
 import todo.entity.Todo;
 import utils.BooleanUtils;
 
-public class TodoDAO extends DAO{
-	/**
-	 *
-	 * @param select
-	 * @return
-	 * @throws Exception
-	 * ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸ã§æ¤œç´¢ãƒœã‚¿ãƒ³ã§æ¤œç´¢ã™ã‚‹ã¨ã€ä¸€è¦§æƒ…å ±ãŒè¡¨ç¤ºã•ã‚Œã¾ã™ã€‚
-	 */
-	public List<Todo> todoSearch(Todo select) throws Exception {
-		List<Todo> returnList = new ArrayList<Todo>();
-		//String sql = "SELECT * FROM test2.todo WHERE title LIKE ? AND date_from = ?";
-		//String sql = "SELECT * FROM test2.todo WHERE date_from = ?";
-		String sql = "SELECT * FROM test2.todo WHERE title LIKE ? AND date_from BETWEEN (? - INTERVAL 1 WEEK) AND now()";
-		//ãƒ—ãƒªãƒšã‚¢ãƒ¼ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆãƒ¡ãƒ³ãƒˆã‚’å–å¾—ã—ã€å®Ÿè¡ŒSQLã‚’æ¸¡ã™
-		PreparedStatement statement = getPreparedStatement(sql);
-		statement.setString(1, "%" + select.getTitle() + "%");
-		statement.setDate(2,select.getDate_from());
-		//SQLã‚’å®Ÿè¡Œã—ãã®çµæœã‚’å–å¾—ã™ã‚‹
-		ResultSet rs = statement.executeQuery();
+public class TodoDAO extends DAO
+{
+//    /**
+//     *
+//     * @param select
+//     * @return
+//     * @throws Exception ƒgƒbƒvƒy[ƒW‚ÅŒŸõƒ{ƒ^ƒ“‚ÅŒŸõ‚·‚é‚ÆAˆê——î•ñ‚ª•\¦‚³‚ê‚Ü‚·B
+//     */
+//    public List<Todo> todoSelectByTitleAndFrom(Todo select) throws Exception
+//    {
+//        List<Todo> returnList = new ArrayList<Todo>();
+//        String sql = "SELECT * FROM todo WHERE done_flag = ? AND title LIKE ? AND date_from BETWEEN (? - INTERVAL 1 WEEK) AND now()";
+//        // ƒvƒŠƒyƒA[ƒhƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾‚µAÀsSQL‚ğ“n‚·
+//        PreparedStatement statement = getPreparedStatement(sql);
+//        statement.setBoolean(1, select.isDone_flag());
+//        statement.setString(2, "%" + select.getTitle() + "%");
+//        statement.setDate(3, select.getDate_from());
+//        // SQL‚ğÀs‚µ‚»‚ÌŒ‹‰Ê‚ğæ“¾‚·‚é
+//        ResultSet rs = statement.executeQuery();
+//        // System.out.println("done_flag‚É“n‚³‚ê‚½’l‚ª" + select.isDone_flag());
+//        while (rs.next())
+//        {
+//            Todo entity = new Todo();
+//            entity.setId(rs.getInt("id"));
+//            entity.setDate_from(rs.getDate("date_from"));
+//            entity.setDate_to(rs.getDate("date_to"));
+//            entity.setTitle(rs.getString("title"));
+//            entity.setDetail(rs.getString("detail"));
+//            // entity.setDone_flag(Boolean.getBoolean(rs.getString("done_flag")));
+//            // entity.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
+//            entity.setDone_flag(BooleanUtils.sqlboolean(rs.getString("done_flag")));
+//            returnList.add(entity);
+//        }
+//        return returnList;
+//    }
 
-		while(rs.next()) {
-			Todo dto = new Todo();
-			dto.setId(rs.getInt("id"));
-			dto.setDate_from(rs.getDate("date_from"));
-			dto.setDate_to(rs.getDate("date_to"));
-			dto.setTitle(rs.getString("title"));
-			dto.setDetail(rs.getString("detail"));
-			dto.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
+    /**
+     *
+     * @param criteria
+     * @return
+     * @throws Exception
+     * @since 2020/12/09
+     *        ƒgƒbƒvƒy[ƒW‚ÅDate_from‚ÆDate_to‚ÅŒŸõ‚·‚é‚ÆADate_from‚©‚çDate_to‚Ü‚Å‚Ìˆê——î•ñ‚ª•\¦‚³‚ê‚Ü‚·B
+     */
+    public List<Todo> todoSelectByTitleAndFromTo(TodoCriteria criteria) throws Exception
+    {
+//        String sql = "SELECT * FROM todo WHERE done_flag = ? AND title LIKE ? AND date_from BETWEEN ? AND ? ";
+        StringBuilder sql = new StringBuilder("SELECT * FROM todo WHERE 1 = 1 ");
+        List<Object> parameters = new ArrayList<>();
+        if (!criteria.getTitle().isEmpty())
+        {
+            sql.append("AND title LIKE ? ");
+            parameters.add(criteria.getTitle());
+        }
 
-			returnList.add(dto);
-		}
-		return returnList;
-	}
-	/**
-	 *
-	 * @param dto
-	 * @return
-	 * @throws Exception
-	 * ãƒ­ã‚°ã‚¤ãƒ³ã—ãŸãƒ¡ãƒ³ãƒãƒ¼ã®userIdã‚’ç™»éŒ²ç”»é¢ã§date_from,date_toã€ã‚¿ã‚¤ãƒˆãƒ«ã€è©³ç´°æƒ…å ±ã€done_flagã‚’å…¥åŠ›ã™ã‚‹ã€‚
-	 * ãã®å¾Œã€t_registerãƒ¡ã‚½ãƒƒãƒ‰ã‚’é€šã—ã¦ã€ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã«ç™»éŒ²ã•ã‚Œã¾ã™ã€‚
-	 */
-	public int t_register(Todo dto)throws Exception {
-		String sql = "INSERT INTO test2.todo(date_from,date_to,title,detail,done_flag,user_id) VALUES(?,?,?,?,?,?)";
-		int result = 0;
-		try {
-			PreparedStatement statement = getPreparedStatement(sql);
-			statement.setDate(1,dto.getDate_from());
-			statement.setDate(2,dto.getDate_to());
-			statement.setString(3, dto.getTitle());
-			statement.setString(4, dto.getDetail());
-			statement.setBoolean(5, dto.isDone_flag());
-			statement.setInt(6, dto.getUserId());
+        if (criteria.getDate_from() != null && criteria.getDate_to() != null)
+        {
+            sql.append("AND date_from BETWEEN ? AND ? ");
+            parameters.add(criteria.getDate_from());
+            parameters.add(criteria.getDate_to());
+            sql.append("OR ((date_to BETWEEN ? AND ?) OR (date_from <= ? AND date_to >= ?)) ");
+            parameters.add(criteria.getDate_from());
+            parameters.add(criteria.getDate_to());
+            parameters.add(criteria.getDate_from());
+            parameters.add(criteria.getDate_to());
+        }
+        else if (criteria.getDate_to() != null)
+        {
+//            sql.append("AND date_to BETWEEN (Select Min(date_to) From todo) AND ? ");
+            sql.append("AND date_from <= ? ");
+            parameters.add(criteria.getDate_to());
+        }
+        else if (criteria.getDate_from() != null)
+        {
+//            sql.append("AND date_from BETWEEN (? - INTERVAL 1 WEEK) AND now() ");
+            sql.append("AND date_to >= ? ");
+            parameters.add(criteria.getDate_from());
+        }
 
-			result = statement.executeUpdate();
-			//ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-			super.commit();
-		}catch(Exception e) {
-			//ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’è¡Œã†
-			super.rollback();
-			throw e;
-	}
-		return result;
+        if(criteria.getDone() != null)
+        {
+            sql.append("AND done_flag = ? ");
+            parameters.add(criteria.getDone());
+        }
 
-	}
-	/**
-	 *
-	 * @param id
-	 * @return
-	 * @throws Exception
-	 * ãƒ­ã‚°ã‚¤ãƒ³ãƒ¡ã‚½ãƒƒãƒ‰ã§æ¸¡ã•ã‚ŒãŸã€idæƒ…å ±ã‚’å–å¾—ã—ã¾ã™ã€‚
-	 * æ¸¡ã•ã‚ŒãŸidã‚’å…ƒã«ãƒ¡ãƒ³ãƒãƒ¼æƒ…å ±ã‚’æ›´æ–°ã™ã‚‹ãŸã‚ã®è©³ç´°ç”»é¢ãŒè¡¨ç¤ºã•ã‚Œã¾ã™ã€‚
-	 */
-	public Todo t_updetail(int id)throws Exception {
-		String sql = "SELECT * FROM test2.todo WHERE id = ?";
-		PreparedStatement statement = getPreparedStatement(sql);
-		statement.setInt(1, id);
-		Todo dto = null;
-		ResultSet rs = statement.executeQuery();
-		if(rs.next()) {
-			dto = new Todo();
-			dto.setId(rs.getInt("id"));
-			dto.setDate_from(rs.getDate("date_from"));
-			dto.setDate_to(rs.getDate("date_to"));
-			dto.setTitle(rs.getString("title"));
-			dto.setDetail(rs.getString("detail"));
-			dto.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
-			//dto.setUserId(rs.getInt("userId"));
-		}
-		return dto;
-	}
-	/**
-	 *
-	 * @param dto
-	 * @return
-	 * @throws Exception
-	 * æ›´æ–°ç”»é¢ã§è‹—å­—ã€åå‰ã€ãƒ­ã‚°ã‚¤ãƒ³IDã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã€å‰Šé™¤ãƒ•ãƒ©ãƒƒã‚°ã€ç™»éŒ²æ—¥ã€æ›´æ–°æ—¥ã€æœ€çµ‚æ›´æ–°æ—¥ã‚’å…¥åŠ›ã™ã‚‹ã€‚
-	 * ãã®å¾Œã€m_registerãƒ¡ã‚½ãƒƒãƒ‰ã‚’é€šã—ã¦ã€ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã«ç™»éŒ²ã•ã‚Œã¾ã™ã€‚
-	 */
-	public int t_update(Todo dto)throws Exception {
-		String sql = "UPDATE test2.todo SET date_from = ?,date_to = ?,title = ?,detail = ?,user_id = ? WHERE id = ?";
-		int result = 0;
-		try {
-			PreparedStatement statement = getPreparedStatement(sql);
-			statement.setDate(1, dto.getDate_from());
-			statement.setDate(2, dto.getDate_to());
-			statement.setString(3, dto.getTitle());
-			statement.setString(4, dto.getDetail());
-			statement.setInt(5, dto.getUserId());
-			statement.setInt(6, dto.getId());
+        sql.append("ORDER BY date_to ASC ");
 
-			result = statement.executeUpdate();
-			//ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-			super.commit();
-		}catch(Exception e) {
-			//ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’è¡Œã†
-			super.rollback();
-			throw e;
-		}
-		return result;
-	}
-	public int todoupdateflag(Todo dto) throws Exception{
-		String sql = "UPDATE test2.todo SET done_flag = true WHERE id = ?";
-		int result = 0;
-		try {
-			PreparedStatement statement = getPreparedStatement(sql);
-			//statement.setBoolean(1, dto.isDone_flag());
-			statement.setInt(1, dto.getId());
+//        String sql = "SELECT * FROM todo WHERE done_flag = ? AND title LIKE ? AND date_from BETWEEN ? AND ? ";
 
-			result = statement.executeUpdate();
-			//ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-			super.commit();
-		}catch(Exception e) {
-			//ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’è¡Œã†
-			super.rollback();
-			throw e;
-		}
-		return result;
-	}
+        List<Todo> returnList = new ArrayList<Todo>();
+        // ƒvƒŠƒyƒA[ƒhƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾‚µAÀsSQL‚ğ“n‚·
+        PreparedStatement statement = getPreparedStatement(sql.toString());
+        for (int i = 0; i < parameters.size(); i++)
+        {
+            Object param = parameters.get(i);
+            statement.setObject(i + 1, param);
+        }
+
+        /*
+         * statement.setBoolean(1, criteria.isDone_flag()); statement.setString(2, "%" +
+         * criteria.getTitle() + "%"); statement.setDate(3, criteria.getDate_from());
+         * statement.setDate(4, criteria.getDate_to());
+         */
+        // SQL‚ğÀs‚µ‚»‚ÌŒ‹‰Ê‚ğæ“¾‚·‚é
+        System.out.println("SQL:" + statement.toString());
+
+        ResultSet rs = statement.executeQuery();
+        System.out.println("date_from‚É“n‚³‚ê‚½’l‚ª" + criteria.getDate_from());
+        System.out.println("date_to‚É“n‚³‚ê‚½’l‚ª" + criteria.getDate_to());
+        while (rs.next())
+        {
+            Todo entity = new Todo();
+            entity.setId(rs.getInt("id"));
+            entity.setDate_from(rs.getDate("date_from"));
+            entity.setDate_to(rs.getDate("date_to"));
+            entity.setTitle(rs.getString("title"));
+            entity.setDetail(rs.getString("detail"));
+            // entity.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
+            // entity.setDone_flag(Boolean.getBoolean(rs.getString("done_flag")));
+            entity.setDone_flag(rs.getBoolean("done_flag"));
+            returnList.add(entity);
+        }
+        return returnList;
+    }
+
+//    /**
+//     *
+//     * @param select
+//     * @return
+//     * @throws Exception
+//     * @since 2020/12/09 ƒgƒbƒvƒy[ƒW‚ÅDate_to‚Ì‚İ‚ÅŒŸõ‚·‚é‚ÆAˆê”ÔÅ‰‚Ì“ú•t‚©‚çDate_to‚Ü‚Å‚Ìˆê——î•ñ‚ª~‡•\¦‚³‚ê‚Ü‚·B
+//     */
+//    public List<Todo> todoSelectByTitleAndTo(Todo select) throws Exception
+//    {
+//        List<Todo> returnList = new ArrayList<Todo>();
+//        String sql = "SELECT * FROM todo WHERE done_flag = ? AND title LIKE ? AND date_to  BETWEEN (Select Min(date_to) From todo) AND ? ORDER BY date_to ASC";
+//        // ƒvƒŠƒyƒA[ƒhƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾‚µAÀsSQL‚ğ“n‚·
+//        PreparedStatement statement = getPreparedStatement(sql);
+//        statement.setBoolean(1, select.isDone_flag());
+//        statement.setString(2, "%" + select.getTitle() + "%");
+//        statement.setDate(3, select.getDate_to());
+//        // SQL‚ğÀs‚µ‚»‚ÌŒ‹‰Ê‚ğæ“¾‚·‚é
+//        ResultSet rs = statement.executeQuery();
+//        while (rs.next())
+//        {
+//            Todo entity = new Todo();
+//            entity.setId(rs.getInt("id"));
+//            entity.setDate_from(rs.getDate("date_from"));
+//            entity.setDate_to(rs.getDate("date_to"));
+//            entity.setTitle(rs.getString("title"));
+//            entity.setDetail(rs.getString("detail"));
+//            // entity.setDone_flag(Boolean.getBoolean(rs.getString("done_flag")));
+//            // entity.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
+//            entity.setDone_flag(BooleanUtils.sqlboolean(rs.getString("done_flag")));
+//            returnList.add(entity);
+//        }
+//        return returnList;
+//    }
+//
+//    /**
+//     *
+//     * @param select
+//     * @return
+//     * @throws Exception
+//     * @since 2020/12/09 ƒgƒbƒvƒy[ƒW‚ÅDate_to‚Ì‚İ‚ÅŒŸõ‚·‚é‚ÆAˆê”ÔÅ‰‚Ì“ú•t‚©‚çDate_to‚Ü‚Å‚Ìˆê——î•ñ‚ª•\¦‚³‚ê‚Ü‚·B
+//     */
+//    public List<Todo> todoSelectByTitle(Todo select) throws Exception
+//    {
+//        List<Todo> returnList = new ArrayList<Todo>();
+//        String sql = "SELECT * FROM todo WHERE done_flag = ? AND title LIKE ? ";
+//        // ƒvƒŠƒyƒA[ƒhƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾‚µAÀsSQL‚ğ“n‚·
+//        PreparedStatement statement = getPreparedStatement(sql);
+//        statement.setBoolean(1, select.isDone_flag());
+//        statement.setString(2, "%" + select.getTitle() + "%");
+//        // SQL‚ğÀs‚µ‚»‚ÌŒ‹‰Ê‚ğæ“¾‚·‚é
+//        ResultSet rs = statement.executeQuery();
+//        while (rs.next())
+//        {
+//            Todo entity = new Todo();
+//            entity.setId(rs.getInt("id"));
+//            entity.setDate_from(rs.getDate("date_from"));
+//            entity.setDate_to(rs.getDate("date_to"));
+//            entity.setTitle(rs.getString("title"));
+//            entity.setDetail(rs.getString("detail"));
+//            // entity.setDone_flag(Boolean.getBoolean(rs.getString("done_flag")));
+//            entity.setDone_flag(BooleanUtils.sqlboolean(rs.getString("done_flag")));
+//            returnList.add(entity);
+//        }
+//        return returnList;
+//    }
+
+    /**
+     *
+     * @param entity
+     * @return
+     * @throws Exception ƒƒOƒCƒ“‚µ‚½ƒƒ“ƒo[‚ÌuserId‚ğ“o˜^‰æ–Ê‚Ådate_from,date_toAƒ^ƒCƒgƒ‹AÚ×î•ñAdone_flag‚ğ“ü—Í‚·‚éB
+     *                   ‚»‚ÌŒãAt_registerƒƒ\ƒbƒh‚ğ’Ê‚µ‚ÄAƒf[ƒ^ƒx[ƒX‚É“o˜^‚³‚ê‚Ü‚·B
+     */
+    public int todoRegister(Todo entity) throws Exception
+    {
+        String sql = "INSERT INTO todo(date_from,date_to,title,detail,done_flag,user_id) VALUES(?,?,?,?,?,?)";
+        int result = 0;
+        try
+        {
+            PreparedStatement statement = getPreparedStatement(sql);
+            statement.setDate(1, entity.getDate_from());
+            statement.setDate(2, entity.getDate_to());
+            statement.setString(3, entity.getTitle());
+            statement.setString(4, entity.getDetail());
+            statement.setBoolean(5, entity.isDone_flag());
+            statement.setInt(6, entity.getUserId());
+
+            result = statement.executeUpdate();
+            // ƒRƒ~ƒbƒg‚ğs‚¤
+            super.commit();
+        }
+        catch (Exception e)
+        {
+            // ƒ[ƒ‹ƒoƒbƒN‚ğs‚¤
+            super.rollback();
+            throw e;
+        }
+        return result;
+
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     * @throws Exception ƒƒOƒCƒ“ƒƒ\ƒbƒh‚Å“n‚³‚ê‚½Aidî•ñ‚ğæ“¾‚µ‚Ü‚·B
+     *                   “n‚³‚ê‚½id‚ğŒ³‚Éƒƒ“ƒo[î•ñ‚ğXV‚·‚é‚½‚ß‚ÌÚ×‰æ–Ê‚ª•\¦‚³‚ê‚Ü‚·B
+     */
+    public Todo todoDetail(int id) throws Exception
+    {
+        String sql = "SELECT * FROM todo WHERE id = ?";
+        PreparedStatement statement = getPreparedStatement(sql);
+        statement.setInt(1, id);
+        Todo entity = null;
+        ResultSet rs = statement.executeQuery();
+        if (rs.next())
+        {
+            entity = new Todo();
+            entity.setId(rs.getInt("id"));
+            entity.setDate_from(rs.getDate("date_from"));
+            entity.setDate_to(rs.getDate("date_to"));
+            entity.setTitle(rs.getString("title"));
+            entity.setDetail(rs.getString("detail"));
+            // entity.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
+            entity.setDone_flag(BooleanUtils.sqlboolean(rs.getString("done_flag")));
+            // dto.setUserId(rs.getInt("userId"));
+        }
+        return entity;
+    }
+
+    /**
+     *
+     * @param entity
+     * @return
+     * @throws Exception XV‰æ–Ê‚Å•cšA–¼‘OAƒƒOƒCƒ“IDAƒpƒXƒ[ƒhAíœƒtƒ‰ƒbƒOA“o˜^“úAXV“úAÅIXV“ú‚ğ“ü—Í‚·‚éB
+     *                   ‚»‚ÌŒãAm_registerƒƒ\ƒbƒh‚ğ’Ê‚µ‚ÄAƒf[ƒ^ƒx[ƒX‚É“o˜^‚³‚ê‚Ü‚·B
+     */
+    public int todoUpdate(Todo entity) throws Exception
+    {
+        // String sql = "UPDATE test2.todo SET date_from = ?,date_to = ?,title =
+        // ?,detail = ?,user_id = ? WHERE id = ?";
+        String sql = "UPDATE todo SET date_from = ?,date_to = ?,title = ?,detail = ?,done_flag = ? WHERE id = ?";
+        int result = 0;
+        try
+        {
+            PreparedStatement statement = getPreparedStatement(sql);
+            statement.setDate(1, entity.getDate_from());
+            statement.setDate(2, entity.getDate_to());
+            statement.setString(3, entity.getTitle());
+            statement.setString(4, entity.getDetail());
+            // statement.setInt(5, dto.getUserId());
+            statement.setBoolean(5, entity.isDone_flag());
+            statement.setInt(6, entity.getId());
+
+            result = statement.executeUpdate();
+            // ƒRƒ~ƒbƒg‚ğs‚¤
+            super.commit();
+        }
+        catch (Exception e)
+        {
+            // ƒ[ƒ‹ƒoƒbƒN‚ğs‚¤
+            super.rollback();
+            throw e;
+        }
+        return result;
+    }
+
+    public int todoUpdateDone_flag(Todo entity) throws Exception
+    {
+        String sql = "UPDATE todo SET done_flag = true WHERE id = ?";
+        int result = 0;
+        try
+        {
+            PreparedStatement statement = getPreparedStatement(sql);
+            // statement.setBoolean(1, dto.isDone_flag());
+            statement.setInt(1, entity.getId());
+
+            result = statement.executeUpdate();
+            // ƒRƒ~ƒbƒg‚ğs‚¤
+            super.commit();
+        }
+        catch (Exception e)
+        {
+            // ƒ[ƒ‹ƒoƒbƒN‚ğs‚¤
+            super.rollback();
+            throw e;
+        }
+        return result;
+    }
 
 }

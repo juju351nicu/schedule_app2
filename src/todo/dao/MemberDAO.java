@@ -3,266 +3,347 @@ package todo.dao;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import todo.entity.Member;
 import todo.entity.Todo;
 import utils.BooleanUtils;
 
-public class MemberDAO extends DAO {
-	/**
-	 *
-	 * @param loginId ãƒ­ã‚°ã‚¤ãƒ³ç”»é¢ã§å…¥åŠ›ã—ãŸã€ãƒ­ã‚°ã‚¤ãƒ³Idã®æƒ…å ±ãŒæ¸¡ã•ã‚Œã¾ã™ã€‚
-	 * @param password ãƒ­ã‚°ã‚¤ãƒ³ç”»é¢ã§å…¥åŠ›ã—ãŸã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã®æƒ…å ±ãŒæ¸¡ã•ã‚Œã¾ã™
-	 * @return
-	 * @throws Exception
-	 * ãƒ­ã‚°ã‚¤ãƒ³ç”»é¢ã§ãƒ­ã‚°ã‚¤ãƒ³IDã¨ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã‚’å…¥åŠ›ã—ãŸã‚‰ã€ãƒ­ã‚°ã‚¤ãƒ³å‡¦ç†ãŒè¡Œã‚ã‚Œã¾ã™ã€‚
-	 */
-	public Member login(String loginId, String password) throws Exception {
-		//    String sql = "SELECT mt.id,mt.name_sei,mt.name_mei,mt.login_id,mt.password,SUBSTR(st.title,1,100),SUBSTR(st.detail,1,100) FROM member mt INNER JOIN todo st ON mt.login_id = st.login_id WHERE mt.login_id = ? AND password = ?";
-		String sql = "SELECT * FROM member m WHERE m.login_id = ? AND password = ?";
-		PreparedStatement statement = getPreparedStatement(sql);
-		statement.setString(1, loginId);
-		statement.setString(2, password);
-		ResultSet rs = statement.executeQuery();
-		Member dto = null;
-		if (rs.next()) {
-			dto = new Member();
-			dto.setId(rs.getInt(1));
-			dto.setName_sei(rs.getString("name_sei"));
-			dto.setName_mei(rs.getString("name_mei"));
-			dto.setLogin_id(rs.getString("login_id"));
-			dto.setPassword(rs.getString("password"));
-			dto.setLast_login(rs.getTimestamp("last_login"));
-			//             dto.setDetail2(rs.getString("SUBSTR(st.detail,1,100)"));
-			//             dto.setTitle2(rs.getString("SUBSTR(st.title,1,100)"));
-			//             dto.setDetail2(rs.getString("detail"));
-			//             dto.setTitle2(rs.getString("title"));
-		}
-		return dto;
-	}
-	/**
-	 *
-	 * @return
-	 * @throws Exception
-	 * ãƒ¡ãƒ³ãƒãƒ¼ã®ä¸€è¦§æƒ…å ±ãŒå–å¾—ã•ã‚Œã¾ã™ã€‚
-	 */
-	public List<Member> SearchList() throws Exception {
-		List<Member> resultList = new ArrayList<Member>();
-		//String sql = "SELECT id,name_sei,name_mei,login_id,password,registered_date,updated_date,last_login,delete_flag FROM test2.member WHERE last_login BETWEEN (CURDATE() - INTERVAL 10 DAY) AND (CURDATE() + INTERVAL 1 DAY)";
-		String sql = "SELECT id,name_sei,name_mei,login_id,password,registered_date,updated_date,last_login,delete_flag FROM test2.member ";
-		// ãƒ—ãƒªãƒšã‚¢ã‚¹ãƒ†ãƒ¼ãƒˆãƒ¡ãƒ³ãƒˆã‚’å–å¾—ã—ã€å®Ÿè¡ŒSQLã‚’æ¸¡ã™
-		PreparedStatement statement = getPreparedStatement(sql);
+public class MemberDAO extends DAO
+{
+    /**
+     *
+     * @param loginId  ƒƒOƒCƒ“‰æ–Ê‚Å“ü—Í‚µ‚½AƒƒOƒCƒ“Id‚Ìî•ñ‚ª“n‚³‚ê‚Ü‚·B
+     * @param password ƒƒOƒCƒ“‰æ–Ê‚Å“ü—Í‚µ‚½AƒpƒXƒ[ƒh‚Ìî•ñ‚ª“n‚³‚ê‚Ü‚·
+     * @return
+     * @throws Exception ƒƒOƒCƒ“‰æ–Ê‚ÅƒƒOƒCƒ“ID‚ÆƒpƒXƒ[ƒh‚ğ“ü—Í‚µ‚½‚çAƒƒOƒCƒ“ˆ—‚ªs‚í‚ê‚Ü‚·B
+     */
+    public Member login(String loginId, String password) throws Exception
+    {
+        // String sql = "SELECT
+        // mt.id,mt.name_sei,mt.name_mei,mt.login_id,mt.password,SUBSTR(st.title,1,100),SUBSTR(st.detail,1,100)
+        // FROM member mt INNER JOIN todo st ON mt.login_id = st.login_id WHERE
+        // mt.login_id = ? AND password = ?";
+        String sql = "SELECT * FROM member m WHERE m.login_id = ? AND password = ?";
+        PreparedStatement statement = getPreparedStatement(sql);
+        statement.setString(1, loginId);
+        statement.setString(2, password);
+        ResultSet rs = statement.executeQuery();
+        Member entity = null;
+        if (rs.next())
+        {
+            entity = new Member();
+            entity.setId(rs.getInt(1));
+            entity.setName_sei(rs.getString("name_sei"));
+            entity.setName_mei(rs.getString("name_mei"));
+            entity.setLogin_id(rs.getString("login_id"));
+            entity.setPassword(rs.getString("password"));
+            // entity.setLast_login(rs.getTimestamp("last_login"));
+            entity.setLast_login(Timestamp.valueOf(LocalDateTime.now()));
+            // dto.setDetail2(rs.getString("SUBSTR(st.detail,1,100)"));
+            // dto.setTitle2(rs.getString("SUBSTR(st.title,1,100)"));
+            // dto.setDetail2(rs.getString("detail"));
+            // dto.setTitle2(rs.getString("title"));
+        }
+        return entity;
+    }
 
-		// SQLã‚’å®Ÿè¡Œã—ã¦ãã®çµæœã‚’å–å¾—ã™ã‚‹
-		ResultSet rs = statement.executeQuery();
+    /**
+     *
+     * @return
+     * @throws Exception ƒƒ“ƒo[‚Ìˆê——î•ñ‚ªæ“¾‚³‚ê‚Ü‚·B
+     */
+    public List<Member> memberList() throws Exception
+    {
+        List<Member> resultList = new ArrayList<Member>();
+        // String sql = "SELECT
+        // id,name_sei,name_mei,login_id,password,registered_date,updated_date,last_login,delete_flag
+        // FROM test2.member WHERE last_login BETWEEN (CURDATE() - INTERVAL 10 DAY) AND
+        // (CURDATE() + INTERVAL 1 DAY)";
+        String sql = "SELECT id,name_sei,name_mei,login_id,password,registered_date,updated_date,last_login,delete_flag FROM member ";
+        // ƒvƒŠƒyƒAƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾‚µAÀsSQL‚ğ“n‚·
+        PreparedStatement statement = getPreparedStatement(sql);
 
-		// æ¤œç´¢çµæœã®è¡Œæ•°åˆ†ãƒ•ã‚§ãƒƒãƒã‚’è¡Œã„ã€å–å¾—çµæœã‚’Todoã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã¸æ ¼ç´ã™ã‚‹
-		while (rs.next()) {
-			Member dto = new Member();
-			dto.setId(rs.getInt("id"));
-			dto.setName_sei(rs.getString("name_sei"));
-			dto.setName_mei(rs.getString("name_mei"));
-			dto.setLogin_id(rs.getString("login_id"));
-			dto.setPassword(rs.getString("password"));
-			dto.setRegistered_date(rs.getTimestamp("registered_date"));
-			dto.setUpdated_date(rs.getTimestamp("updated_date"));
-			dto.setLast_login(rs.getTimestamp("last_login"));
-			dto.setDelete_flag(rs.getByte("delete_flag"));
-			resultList.add(dto);
-		}
+        // SQL‚ğÀs‚µ‚Ä‚»‚ÌŒ‹‰Ê‚ğæ“¾‚·‚é
+        ResultSet rs = statement.executeQuery();
 
-		return resultList;
-	}
-	/**
-	 *
-	 * @param dto
-	 * @return
-	 * @throws Exception
-	 * ç™»éŒ²ç”»é¢ã§è‹—å­—ã€åå‰ã€ãƒ­ã‚°ã‚¤ãƒ³IDã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã€å‰Šé™¤ãƒ•ãƒ©ãƒƒã‚°ã€ç™»éŒ²æ—¥ã€æ›´æ–°æ—¥ã€æœ€çµ‚æ›´æ–°æ—¥ã‚’å…¥åŠ›ã™ã‚‹ã€‚
-	 * ãã®å¾Œã€m_registerãƒ¡ã‚½ãƒƒãƒ‰ã‚’é€šã—ã¦ã€ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã«ç™»éŒ²ã•ã‚Œã¾ã™ã€‚
-	 */
-	public int m_register(Member dto) throws Exception {
-		String sql = "INSERT INTO member(name_sei,name_mei,login_id,password,delete_flag,registered_date,updated_date,last_login) VALUES(?,?,?,?,?,?,?,?)";
-		int result = 0;
-		try {
-			PreparedStatement statement = getPreparedStatement(sql);
-			statement.setString(1, dto.getName_sei());
-			statement.setString(2, dto.getName_mei());
-			statement.setString(3, dto.getLogin_id());
-			statement.setString(4, dto.getPassword());
-			statement.setBoolean(5, dto.getDelete_flag());
-			statement.setTimestamp(6, dto.getRegistered_date());
-			statement.setTimestamp(7, dto.getUpdated_date());
-			statement.setTimestamp(8, dto.getLast_login());
+        // ŒŸõŒ‹‰Ê‚Ìs”•ªƒtƒFƒbƒ`‚ğs‚¢Aæ“¾Œ‹‰Ê‚ğTodoƒCƒ“ƒXƒ^ƒ“ƒX‚ÖŠi”[‚·‚é
+        while (rs.next())
+        {
+            Member entity = new Member();
+            entity.setId(rs.getInt("id"));
+            entity.setName_sei(rs.getString("name_sei"));
+            entity.setName_mei(rs.getString("name_mei"));
+            entity.setLogin_id(rs.getString("login_id"));
+            entity.setPassword(rs.getString("password"));
+            entity.setRegistered_date(rs.getTimestamp("registered_date"));
+            entity.setUpdated_date(rs.getTimestamp("updated_date"));
+            entity.setLast_login(rs.getTimestamp("last_login"));
+            entity.setDelete_flag(BooleanUtils.sqlboolean(rs.getString("delete_flag")));
+            // entity.setDelete_flag(Boolean.parseBoolean(rs.getString("delete_flag")));
+            resultList.add(entity);
+        }
 
-			result = statement.executeUpdate();
-			//ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-			super.commit();
-		} catch (Exception e) {
-			//ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’è¡Œã†
-			super.rollback();
-			throw e;
-		}
-		return result;
-	}
-	/**
-	 *
-	 * @param dto
-	 * @return
-	 * @throws Exception
-	 * æ›´æ–°ç”»é¢ã§è‹—å­—ã€åå‰ã€ãƒ­ã‚°ã‚¤ãƒ³IDã€ãƒ‘ã‚¹ãƒ¯ãƒ¼ãƒ‰ã€å‰Šé™¤ãƒ•ãƒ©ãƒƒã‚°ã€ç™»éŒ²æ—¥ã€æ›´æ–°æ—¥ã€æœ€çµ‚æ›´æ–°æ—¥ã‚’å…¥åŠ›ã™ã‚‹ã€‚
-	 * ãã®å¾Œã€m_registerãƒ¡ã‚½ãƒƒãƒ‰ã‚’é€šã—ã¦ã€ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã«ç™»éŒ²ã•ã‚Œã¾ã™ã€‚
-	 */
-	public int m_update(Member dto) throws Exception {
-		String sql = "UPDATE member SET name_sei = ?,name_mei = ?,login_id = ?,password = ?,registered_date = ?,updated_date = ?,last_login = ?,delete_flag = ? WHERE id = ?";
-		int result = 0;
-		try {
-			PreparedStatement statement = getPreparedStatement(sql);
-			statement.setString(1, dto.getName_sei());
-			statement.setString(2, dto.getName_mei());
-			statement.setString(3, dto.getLogin_id());
-			statement.setString(4, dto.getPassword());
-			statement.setTimestamp(5, dto.getRegistered_date());
-			statement.setTimestamp(6, dto.getUpdated_date());
-			statement.setTimestamp(7, dto.getLast_login());
-			statement.setBoolean(8, dto.getDelete_flag());
-			statement.setInt(9, dto.getId());
+        return resultList;
+    }
 
-			result = statement.executeUpdate();
-			//ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-			super.commit();
-		} catch (Exception e) {
-			//ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’è¡Œã†
-			super.rollback();
-			throw e;
-		}
-		return result;
-	}
+    /**
+     * @param entity
+     * @return
+     * @throws Exception “o˜^‰æ–Ê‚Å•cšA–¼‘OAƒƒOƒCƒ“IDAƒpƒXƒ[ƒhAíœƒtƒ‰ƒbƒOA“o˜^“úAXV“úAÅIXV“ú‚ğ“ü—Í‚·‚éB
+     *                   ‚»‚ÌŒãAm_registerƒƒ\ƒbƒh‚ğ’Ê‚µ‚ÄAƒf[ƒ^ƒx[ƒX‚É“o˜^‚³‚ê‚Ü‚·B
+     */
+    public int memberRegister(Member entity) throws Exception
+    {
+        // String sql = "INSERT INTO
+        // member(name_sei,name_mei,login_id,password,delete_flag,registered_date,updated_date,last_login)
+        // VALUES(?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO member(name_sei,name_mei,login_id,password,delete_flag,registered_date) VALUES(?,?,?,?,?,?)";
 
-	/**
-	 *
-	 * @param userId
-	 * @return
-	 * @throws Exception
-	 * ãƒ­ã‚°ã‚¤ãƒ³ã—ãŸå¾Œã€ãƒˆãƒƒãƒ—ãƒšãƒ¼ã‚¸ã«é£›ã¶ã¨Todoã‚¯ãƒ©ã‚¹ã®æƒ…å ±ãŒä¸€è¦§æƒ…å ±ã§è¡¨ç¤ºã•ã‚Œã¾ã™ã€‚
-	 */
-	public List<Todo> getTodoSummary(int userId) throws Exception {
-		//String sql = "SELECT id,title,SUBSTR(detail,1,10) AS 'detail',date_from,date_to,done_flag FROM test2.todo  WHERE user_id = ?";
-		String sql = "SELECT * FROM test2.todo  WHERE user_id = ? AND done_flag = false ORDER BY date_from DESC";
-		PreparedStatement statement = getPreparedStatement(sql);
-		statement.setInt(1, userId);
+        int result = 0;
+        try
+        {
+            PreparedStatement statement = getPreparedStatement(sql);
+            statement.setString(1, entity.getName_sei());
+            statement.setString(2, entity.getName_mei());
+            statement.setString(3, entity.getLogin_id());
+            statement.setString(4, entity.getPassword());
+            statement.setBoolean(5, entity.getDelete_flag());
+            statement.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
+            /*
+             * statement.setTimestamp(6, entity.getRegistered_date());
+             * statement.setTimestamp(7, entity.getUpdated_date());
+             * statement.setTimestamp(8, entity.getLast_login());
+             */
 
-		// SQLã‚’å®Ÿè¡Œã—ã¦ãã®çµæœã‚’å–å¾—ã™ã‚‹
-		ResultSet rs = statement.executeQuery();
+            result = statement.executeUpdate();
+            // ƒRƒ~ƒbƒg‚ğs‚¤
+            super.commit();
+        }
+        catch (Exception e)
+        {
+            // ƒ[ƒ‹ƒoƒbƒN‚ğs‚¤
+            super.rollback();
+            throw e;
+        }
+        return result;
+    }
 
-		// æ¤œç´¢çµæœã®è¡Œæ•°åˆ†ãƒ•ã‚§ãƒƒãƒã‚’è¡Œã„ã€å–å¾—çµæœã‚’Todoã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã¸æ ¼ç´ã™ã‚‹
-		List<Todo> resultList = new ArrayList<>();
-		while (rs.next()) {
-			Todo dto = new Todo();
-			dto.setId(rs.getInt("id"));
-			dto.setDate_from(rs.getDate("date_from"));
-			dto.setDate_to(rs.getDate("date_to"));
-			dto.setDetail(rs.getString("detail"));
-			dto.setTitle(rs.getString("title"));
-			dto.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
-			resultList.add(dto);
-		}
+    /**
+     *
+     * @param entity
+     * @return
+     * @throws Exception XV‰æ–Ê‚Å•cšA–¼‘OAƒƒOƒCƒ“IDAƒpƒXƒ[ƒhAíœƒtƒ‰ƒbƒOA“o˜^“úAXV“úAÅIXV“ú‚ğ“ü—Í‚·‚éB
+     *                   ‚»‚ÌŒãAm_registerƒƒ\ƒbƒh‚ğ’Ê‚µ‚ÄAƒf[ƒ^ƒx[ƒX‚É“o˜^‚³‚ê‚Ü‚·B
+     */
+    public int memberUpdate(Member entity) throws Exception
+    {
+        // String sql = "UPDATE member SET name_sei = ?,name_mei = ?,login_id =
+        // ?,password = ?,registered_date = ?,updated_date = ?,last_login =
+        // ?,delete_flag = ? WHERE id = ?";
+        String sql = "UPDATE member SET name_sei = ?,name_mei = ?,login_id = ?,password = ?,updated_date = ?,delete_flag = ? WHERE id = ?";
+        int result = 0;
+        try
+        {
+            PreparedStatement statement = getPreparedStatement(sql);
+            statement.setString(1, entity.getName_sei());
+            statement.setString(2, entity.getName_mei());
+            statement.setString(3, entity.getLogin_id());
+            statement.setString(4, entity.getPassword());
+            statement.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
+            /*
+             * statement.setTimestamp(5, entity.getRegistered_date());
+             * statement.setTimestamp(6, entity.getUpdated_date());
+             * statement.setTimestamp(7, entity.getLast_login());
+             */
+            statement.setBoolean(6, entity.getDelete_flag());
+            statement.setInt(7, entity.getId());
 
-		return resultList;
+            result = statement.executeUpdate();
+            // ƒRƒ~ƒbƒg‚ğs‚¤
+            super.commit();
+        }
+        catch (Exception e)
+        {
+            // ƒ[ƒ‹ƒoƒbƒN‚ğs‚¤
+            super.rollback();
+            throw e;
+        }
+        return result;
+    }
 
-	}
-	/**
-	 *
-	 * @param id
-	 * @return
-	 * @throws Exception
-	 * ãƒ­ã‚°ã‚¤ãƒ³ãƒ¡ã‚½ãƒƒãƒ‰ã§æ¸¡ã•ã‚ŒãŸã€idæƒ…å ±ã‚’å–å¾—ã—ã¾ã™ã€‚
-	 * æ¸¡ã•ã‚ŒãŸidã‚’å…ƒã«ãƒ¡ãƒ³ãƒãƒ¼æƒ…å ±ã‚’æ›´æ–°ã™ã‚‹ãŸã‚ã®è©³ç´°ç”»é¢ãŒè¡¨ç¤ºã•ã‚Œã¾ã™ã€‚
-	 */
-	public Member m_updetail(int id) throws Exception {
-		String sql = "SELECT * FROM test2.member WHERE id = ?";
-		PreparedStatement statement = getPreparedStatement(sql);
-		statement.setInt(1, id);
-		Member dto = null;
-		ResultSet rs = statement.executeQuery();
-		if (rs.next()) {
-			dto = new Member();
-			dto.setId(rs.getInt("id"));
-			dto.setName_sei(rs.getString("name_sei"));
-			dto.setName_mei(rs.getString("name_mei"));
-			dto.setName_sei(rs.getString("name_sei"));
-			dto.setName_mei(rs.getString("name_mei"));
-			dto.setLogin_id(rs.getString("login_id"));
-			dto.setPassword(rs.getString("password"));
-			dto.setRegistered_date(rs.getTimestamp("registered_date"));
-			dto.setUpdated_date(rs.getTimestamp("updated_date"));
-			dto.setLast_login(rs.getTimestamp("last_login"));
-			dto.setDelete_flag(rs.getByte("delete_flag"));
+    /**
+     *
+     * @param userId
+     * @return
+     * @throws Exception ƒƒOƒCƒ“‚µ‚½ŒãAƒgƒbƒvƒy[ƒW‚É”ò‚Ô‚ÆTodoƒNƒ‰ƒX‚Ìî•ñ‚ªˆê——î•ñ‚Å•\¦‚³‚ê‚Ü‚·B
+     */
+    public List<Todo> getTodoSummary(int userId) throws Exception
+    {
+        // String sql = "SELECT id,title,SUBSTR(detail,1,10) AS
+        // 'detail',date_from,date_to,done_flag FROM test2.todo WHERE user_id = ?";
+        String sql = "SELECT * FROM todo  WHERE user_id = ? AND done_flag = false ORDER BY date_from DESC";
+        PreparedStatement statement = getPreparedStatement(sql);
+        statement.setInt(1, userId);
 
-		}
+        // SQL‚ğÀs‚µ‚Ä‚»‚ÌŒ‹‰Ê‚ğæ“¾‚·‚é
+        ResultSet rs = statement.executeQuery();
 
-		return dto;
-	}
-	/**
-	 *
-	 * @param id
-	 * @return
-	 * @throws Exception
-	 * ãƒã‚§ãƒƒã‚¯ãƒœãƒƒã‚¯ã‚¹ã§è¤‡æ•°ã®idã‚’é¸æŠã™ã‚‹ã€‚
-	 * ãã®å¾Œã€å‰Šé™¤ãƒœã‚¿ãƒ³ã‚’æŠ¼ã™ã¨ãƒã‚§ãƒƒã‚¯ã—ãŸ1ä»¶ï½è¤‡æ•°ã®é …ç›®ãŒå‰Šé™¤ã•ã‚Œã‚‹ã€‚
-	 */
-	public int m_delete(String id[]) throws Exception {
-		String[] remove = id;
-		int result = 0;
-		if (remove.length > 0) {
-			for (int i = 0; i < remove.length; i++) {
-				String sql = "DELETE FROM test2.member WHERE id =  ? ";
+        // ŒŸõŒ‹‰Ê‚Ìs”•ªƒtƒFƒbƒ`‚ğs‚¢Aæ“¾Œ‹‰Ê‚ğTodoƒCƒ“ƒXƒ^ƒ“ƒX‚ÖŠi”[‚·‚é
+        List<Todo> resultList = new ArrayList<>();
+        while (rs.next())
+        {
+            Todo entity = new Todo();
+            entity.setId(rs.getInt("id"));
+            entity.setDate_from(rs.getDate("date_from"));
+            entity.setDate_to(rs.getDate("date_to"));
+            entity.setDetail(rs.getString("detail"));
+            entity.setTitle(rs.getString("title"));
+            // entity.setDone_flag(BooleanUtils.sqlboolean(rs.getByte("done_flag")));
+            entity.setDone_flag(Boolean.getBoolean(rs.getString("done_flag")));
+            resultList.add(entity);
+        }
 
-				//ãƒ—ãƒªãƒšã‚¢ãƒ¼ãƒ‰ã‚¹ãƒ†ãƒ¼ãƒˆãƒ¡ãƒ³ãƒˆã‚’å–å¾—ã—ã€å®Ÿè¡ŒSQLã‚’æ¸¡ã™
-				PreparedStatement statement = getPreparedStatement(sql);
-				statement.setInt(1, Integer.parseInt(remove[i]));
-				System.out.println("m_deleteï¼š" + sql + ">");
-				result = statement.executeUpdate();
-				System.out.println(result);
-			}
-		}
-		try {
-			//ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-			super.commit();
+        return resultList;
 
-		} catch (Exception e) {
-			super.rollback();
-		}
+    }
 
-		return result;
-	}
-	/**
-	 *
-	 * @param dto ãƒ­ã‚°ã‚¤ãƒ³ã—ãŸãƒ¦ãƒ¼ã‚¶ã®Idæƒ…å ±ã¨ã€ãƒ­ã‚°ã‚¤ãƒ³ã—ãŸæ™‚åˆ»ã®æƒ…å ±ã‚’å–å¾—ã—ã€æ›´æ–°ã™ã‚‹
-	 * @return
-	 * @throws Exception
-	 * session.getLastAccessedTime()ã‹ã‚‰æƒ…å ±ã‚’å—ã‘å–ã‚Šã€last_loginã®ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã®å€¤ã‚’æ›´æ–°ã™ã‚‹ã€‚
-	 */
-	public int lastlogin(Timestamp last_login, int id) throws Exception {
-		String sql = "UPDATE member SET last_login = ? WHERE id = ?";
-		int result = 0;
-		try {
-			PreparedStatement statement = getPreparedStatement(sql);
-			statement.setTimestamp(1, last_login);
-			statement.setInt(2, id);
+    /**
+     *
+     * @param id
+     * @return
+     * @throws Exception ƒƒOƒCƒ“ƒƒ\ƒbƒh‚Å“n‚³‚ê‚½Aidî•ñ‚ğæ“¾‚µ‚Ü‚·B
+     *                   “n‚³‚ê‚½id‚ğŒ³‚Éƒƒ“ƒo[î•ñ‚ğXV‚·‚é‚½‚ß‚ÌÚ×‰æ–Ê‚ª•\¦‚³‚ê‚Ü‚·B
+     */
+    public Member memberDetail(int id) throws Exception
+    {
+        String sql = "SELECT * FROM member WHERE id = ?";
+        PreparedStatement statement = getPreparedStatement(sql);
+        statement.setInt(1, id);
+        Member entity = null;
+        ResultSet rs = statement.executeQuery();
+        if (rs.next())
+        {
+            entity = new Member();
+            entity.setId(rs.getInt("id"));
+            entity.setName_sei(rs.getString("name_sei"));
+            entity.setName_mei(rs.getString("name_mei"));
+            entity.setName_sei(rs.getString("name_sei"));
+            entity.setName_mei(rs.getString("name_mei"));
+            entity.setLogin_id(rs.getString("login_id"));
+            entity.setPassword(rs.getString("password"));
+            entity.setRegistered_date(rs.getTimestamp("registered_date"));
+            entity.setUpdated_date(rs.getTimestamp("updated_date"));
+            entity.setLast_login(rs.getTimestamp("last_login"));
+            entity.setDelete_flag(Boolean.getBoolean(rs.getString("delete_flag")));
 
-			result = statement.executeUpdate();
-			//ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-			super.commit();
-		} catch (Exception e) {
-			//ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’è¡Œã†
-			super.rollback();
-			throw e;
-		}
-		return result;
-	}
+        }
 
+        return entity;
+    }
+
+//  /**
+//  * w’è‚³‚ê‚½’l‚ğId‚É‚ÂƒŒƒR[ƒh‚·‚×‚Äíœ‚µAíœ‚Å‚«‚½Œ”‚ğ•Ô‚·B
+//  * ¦ƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚Å•¡”‚Ìid‚ğ‘I‘ğ‚·‚éB ‚»‚ÌŒãAíœƒ{ƒ^ƒ“‚ğ‰Ÿ‚·‚Æƒ`ƒFƒbƒN‚µ‚½1Œ`•¡”‚Ì€–Ú‚ªíœ‚³‚ê‚éB
+//  * @param removeIds íœ‘ÎÛƒŒƒR[ƒh‚ÌId
+//  * @return íœ‚Å‚«‚½Œ”
+//  * @throws Exception
+//  */
+// public int memberDelete(String[] removeIds) throws Exception
+// {
+//     int result = 0;
+//     for (int i = 0; i < removeIds.length; i++)
+//     {
+//         String sql = "DELETE FROM test2.member WHERE id =  ? ";
+//
+//         // ƒvƒŠƒyƒA[ƒhƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾‚µAÀsSQL‚ğ“n‚·
+//         PreparedStatement statement = getPreparedStatement(sql);
+//         statement.setInt(1, Integer.parseInt(removeIds[i]));
+//         System.out.println("m_deleteF" + sql + ">");
+//         result = statement.executeUpdate();
+//         System.out.println(result);
+//     }
+//     try
+//     {
+//         // ƒRƒ~ƒbƒg‚ğs‚¤
+//         super.commit();
+//     }
+//     catch (Exception e)
+//     {
+//         super.rollback();
+//     }
+//     System.out.println("–ß‚Á‚Ä‚«‚½s”‚Í" + result);
+//     return result;
+// }
+    /**
+     * w’è‚³‚ê‚½’l‚ğId‚É‚ÂƒŒƒR[ƒh‚·‚×‚Äíœ‚µAíœ‚Å‚«‚½Œ”‚ğ•Ô‚·B ¦ƒ`ƒFƒbƒNƒ{ƒbƒNƒX‚Å•¡”‚Ìid‚ğ‘I‘ğ‚·‚éB
+     * ‚»‚ÌŒãAíœƒ{ƒ^ƒ“‚ğ‰Ÿ‚·‚Æƒ`ƒFƒbƒN‚µ‚½1Œ`•¡”‚Ì€–Ú‚ªíœ‚³‚ê‚éB
+     *
+     * @param removeIds íœ‘ÎÛƒŒƒR[ƒh‚ÌId
+     * @return íœ‚Å‚«‚½Œ”
+     * @throws Exception
+     */
+    public int memberDelete(String[] removeIds) throws Exception
+    {
+        String sql = "DELETE FROM member WHERE id IN ( " + String.join(", ", Collections.nCopies(removeIds.length, "?"))
+                + " )";
+        // DELETE FROM test2.member WHERE id IN ( ?, ?, ?, ?, ? ); // IN‹å
+        int rowCount = 0;
+        try
+        {
+            // ƒvƒŠƒyƒA[ƒhƒXƒe[ƒgƒƒ“ƒg‚ğæ“¾‚µAÀsSQL‚ğ“n‚·
+            PreparedStatement statement = getPreparedStatement(sql);
+            // for (String id : removeIds)
+            for (int i = 0; i < removeIds.length; i++)
+            {
+                statement.setInt(i + 1, Integer.parseInt(removeIds[i]));
+                // statement.setInt(1, Integer.parseInt(id));
+                System.out.println("“n‚³‚ê‚½’l‚Í" + removeIds[i]);
+            }
+            System.out.println("m_deleteF" + sql + ">");
+            rowCount = statement.executeUpdate();
+            System.out.println(rowCount);
+            // ƒRƒ~ƒbƒg‚ğs‚¤
+            super.commit();
+        }
+        catch (Exception e)
+        {
+            super.rollback();
+        }
+        System.out.println("íœ‚µ‚½s”‚Í" + rowCount);
+        return rowCount;
+    }
+
+    /**
+     *
+     * @param dto ƒƒOƒCƒ“‚µ‚½ƒ†[ƒU‚ÌIdî•ñ‚ÆAƒƒOƒCƒ“‚µ‚½‚Ìî•ñ‚ğæ“¾‚µAXV‚·‚é
+     * @return
+     * @throws Exception session.getLastAccessedTime()‚©‚çî•ñ‚ğó‚¯æ‚èAlast_login‚ÌƒtƒB[ƒ‹ƒh‚Ì’l‚ğXV‚·‚éB
+     */
+    public int lastlogin(Timestamp last_login, int id) throws Exception
+    {
+        String sql = "UPDATE member SET last_login = ? WHERE id = ?";
+        int result = 0;
+        try
+        {
+            PreparedStatement statement = getPreparedStatement(sql);
+            statement.setTimestamp(1, last_login);
+            statement.setInt(2, id);
+
+            result = statement.executeUpdate();
+            // ƒRƒ~ƒbƒg‚ğs‚¤
+            super.commit();
+        }
+        catch (Exception e)
+        {
+            // ƒ[ƒ‹ƒoƒbƒN‚ğs‚¤
+            super.rollback();
+            throw e;
+        }
+        return result;
+    }
 
 }

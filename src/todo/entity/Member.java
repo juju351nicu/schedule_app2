@@ -3,6 +3,11 @@ package todo.entity;
 
 import java.sql.Timestamp;
 
+/**
+ * Member table—p‚ÌEntity
+ * @author PC0010
+ *
+ */
 public class Member
 {
     private int id;
@@ -18,7 +23,7 @@ public class Member
     public Member()
     {
     }
-	public int getId()
+    public int getId()
     {
         return id;
     }
@@ -72,7 +77,7 @@ public class Member
     }
     public void setUpdated_date(Timestamp Updated_date)
     {
-    	this.updated_date =Updated_date;
+        this.updated_date =Updated_date;
     }
     public Timestamp getLast_login()
     {
@@ -83,21 +88,12 @@ public class Member
 
         this.last_login = last_login;
     }
-	public boolean getDelete_flag()
-	{
-		return delete_flag;
-	}
-	public void setDelete_flag(int delete_flag) {
-		if(delete_flag == 1)
-		{
-			this.delete_flag = true;
-		}else
-		{
-		this.delete_flag = false;
-		}
-	}
+    public boolean getDelete_flag()
+    {
+        return delete_flag;
+    }
+    public void setDelete_flag(boolean delete_flag) {
 
-
-
-
+            this.delete_flag = delete_flag;
+    }
 }

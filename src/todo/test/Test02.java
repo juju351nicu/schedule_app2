@@ -1,17 +1,14 @@
 package todo.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
 import todo.dao.MemberDAO;
-import todo.entity.Member;
-import todo.web.LoginServlet;
-
-class Test02 extends LoginServlet {
+import todo.dto.Member;
+class Test02 {
     @Test
-    public void testExcute1() {
-    	LoginServlet login = new LoginServlet();
+    public void testExcute1()  {
 
         String login_id = "user01";
         String password = "password";
@@ -20,10 +17,10 @@ class Test02 extends LoginServlet {
         Member entity = dao.login(login_id, password);
         boolean result = (entity != null);
         if(result) {
-            System.out.println("testExcute1 :æˆåŠŸã—ã¾ã—ãŸ");
+            System.out.println("testExcute1 :¬Œ÷‚µ‚Ü‚µ‚½");
             assertEquals(1,1);
         }else {
-            System.out.println("testExcute1 :å¤±æ•—ã—ã¾ã—ãŸ");
+            System.out.println("testExcute1 :¸”s‚µ‚Ü‚µ‚½");
             assertEquals(1,1);
         }
         }

@@ -10,9 +10,9 @@
 <title>ログイン画面</title>
 </head>
 <body>
-<form action="./LoginServlet" method="post">
+<form action="/Member/member/login" method="post">
 <div align="center">
-<h2 class="glyphicon glyphicon-scissors">ログインページ</h2>
+<h2 class="glyphicon glyphicon-scissors">ユーザーログインページ</h2>
 
 
 <table>

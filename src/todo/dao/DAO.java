@@ -10,98 +10,93 @@ import javax.sql.DataSource;
 
 public class DAO implements AutoCloseable {
 
-	private Connection connection = null;
+    private Connection connection = null;
 
-	public DAO() {
+    public DAO() {
+    }
+    /*
+     * ƒf[ƒ^ƒx[ƒX‚Æ‚ÌÚ‘±‚ðŽæ“¾‚·‚éB‚à‚µŽæ“¾‚µ‚Ä‚¢‚½ê‡‚É‚ÍŠù‘¶‚ÌÚ‘±‚ð—˜—p‚µA
+     * Žæ“¾‚µ‚Ä‚¢‚È‚¢ê‡‚ÍV‚½‚ÉƒRƒ“ƒeƒi‚©‚çŽæ“¾‚·‚é
+     *
+     * @return
+     * @throws Exception
+     */
+    public Connection getConnection() throws Exception{
 
-	}
+        // NamingException, SQLException‚ªƒXƒ[‚³‚ê‚é
+        try {
+            if(connection == null || connection.isClosed()) {
+                InitialContext initCtx = new InitialContext();
+                    DataSource ds = (DataSource) initCtx.lookup("java:comp/env/jdbc/localDB");
 
-	/*
-	 * ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹ã¨ã®æŽ¥ç¶šã‚’å–å¾—ã™ã‚‹ã€‚ã‚‚ã—å–å¾—ã—ã¦ã„ãŸå ´åˆã«ã¯æ—¢å­˜ã®æŽ¥ç¶šã‚’åˆ©ç”¨ã—ã€
-	 * å–å¾—ã—ã¦ã„ãªã„å ´åˆã¯æ–°ãŸã«ã‚³ãƒ³ãƒ†ãƒŠã‹ã‚‰å–å¾—ã™ã‚‹
-	 *
-	 * @return
-	 * @throws Exception
-	 */
-	public Connection getConnection() throws Exception{
+                // ƒf[ƒ^ƒx[ƒXÚ‘±‚ðŽæ“¾‚·‚é
+                connection = ds.getConnection();
+            }
+        }catch (NamingException|SQLException e) {
+            // ‚à‚µÚ‘±Žæ“¾‚Å—áŠO‚ªo‚½ê‡‚Íconnectionnull‚É‚µA”h¶‚µ‚½—áŠO‚Í‚»‚Ì‚Ü‚Ü‘—o‚·‚é
+            e.printStackTrace();
+            connection = null;
+            throw e;
+        }
+        return connection;
+    }
 
-		// NamingException, SQLExceptionãŒã‚¹ãƒ­ãƒ¼ã•ã‚Œã‚‹
-		try {
-			if(connection == null || connection.isClosed()) {
-				InitialContext initCtx = new InitialContext();
-					DataSource ds = (DataSource) initCtx.lookup("java:comp/env/jdbc/localDB");
+    /*
+     * Ú‘±‚ð•Â‚¶‚éAŠmŽÀ‚ÉÚ‘±‚ðŠJ•ú‚·‚é‚½‚ßfinnaly‚Åconnection=null‚ðs‚¤
+     *
+     */
+    public void closeConnection() {
+        try {
+            connection.close();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            connection = null;
+        }
+    }
 
-				// ãƒ‡ãƒ¼ã‚¿ãƒ™ãƒ¼ã‚¹æŽ¥ç¶šã‚’å–å¾—ã™ã‚‹
-				connection = ds.getConnection();
-			}
-		}catch (NamingException|SQLException e) {
-			// ã‚‚ã—æŽ¥ç¶šå–å¾—ã§ä¾‹å¤–ãŒå‡ºãŸå ´åˆã¯connectionnullã«ã—ã€æ´¾ç”Ÿã—ãŸä¾‹å¤–ã¯ãã®ã¾ã¾é€å‡ºã™ã‚‹
-			e.printStackTrace();
-			connection = null;
-			throw e;
-		}
-		return connection;
-	}
+    /*
+     * PrepareStatement‚ð•Ô‚·
+     *
+     * @parap sql
+     * @return
+     * @throws Exception
+     *
+     */
+    public PreparedStatement getPreparedStatement(String sql) throws Exception{
+        return getConnection().prepareStatement(sql);
+    }
 
-	/*
-	 * æŽ¥ç¶šã‚’é–‰ã˜ã‚‹ã€ç¢ºå®Ÿã«æŽ¥ç¶šã‚’é–‹æ”¾ã™ã‚‹ãŸã‚finnalyã§connection=nullã‚’è¡Œã†
-	 *
-	 */
-	public void closeConnection() {
-		try {
-			connection.close();
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			connection = null;
-		}
-	}
+    /*
+     * ƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“‚ÌƒRƒ~ƒbƒg‚ðs‚¤
+     *
+     * @throws SQLException
+     */
+    public void commit() throws SQLException{
+        connection.commit();
+    }
 
-	/*
-	 * PrepareStatementã‚’è¿”ã™
-	 *
-	 * @parap sql
-	 * @return
-	 * @throws Exception
-	 *
-	 */
-	public PreparedStatement getPreparedStatement(String sql) throws Exception{
-		return getConnection().prepareStatement(sql);
-	}
-
-	/*
-	 * ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ã®ã‚³ãƒŸãƒƒãƒˆã‚’è¡Œã†
-	 *
-	 * @throws SQLException
-	 */
-	public void commit() throws SQLException{
-		connection.commit();
-	}
-
-	/*
-	 * ãƒˆãƒ©ãƒ³ã‚¶ã‚¯ã‚·ãƒ§ãƒ³ã®ãƒ­ãƒ¼ãƒ«ãƒãƒƒã‚¯ã‚’è¡Œã†
-	 *
-	 * @throws SQLException
-	 */
-	public void rollback() throws SQLException{
-		connection.rollback();
-	}
-
-	/*
-	 * æŽ¥ç¶šã‚’é–‰ã˜ã‚‹
-	 *
-	 */
-
-	@Override
-	public void close() throws Exception {
-		System.out.println("close connection ------------------------------->");
-
-		try {
-			connection.close();
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}finally {
-			connection = null;
-		}
-	}
+    /*
+     * ƒgƒ‰ƒ“ƒUƒNƒVƒ‡ƒ“‚Ìƒ[ƒ‹ƒoƒbƒN‚ðs‚¤
+     *
+     * @throws SQLException
+     */
+    public void rollback() throws SQLException{
+        connection.rollback();
+    }
+    /*
+     * Ú‘±‚ð•Â‚¶‚é
+     *
+     */
+    @Override
+    public void close() throws Exception {
+        System.out.println("close connection ------------------------------->");
+        try {
+            connection.close();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }finally {
+            connection = null;
+        }
+    }
 }

@@ -46,7 +46,7 @@ public class LoginServlet extends HttpServlet
                 session.setAttribute("user", entity);
 //                RequestDispatcher rd = request.getRequestDispatcher("/top.jsp");
 //                rd.forward(request, response);
-                response.sendRedirect("./todo/Top"); // PRGパターン（Post>Redirt>Get）
+                response.sendRedirect("./todo/Top");
 
                 System.out.println("セッション最終アクセス時刻：" + new Timestamp( session.getLastAccessedTime() ) );
             }
